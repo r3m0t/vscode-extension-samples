@@ -48,7 +48,7 @@ export class TestFile {
 				finished.item.children.replace(finished.children);
 			}
 		};
-
+/*
 		parseMarkdown(content, {
 			onTest: (range, a, operator, b, expected) => {
 				const parent = ancestors[ancestors.length - 1];
@@ -76,6 +76,9 @@ export class TestFile {
 		});
 
 		ascend(0); // finish and assign children for all remaining items
+	*/
+
+	item.error = "no";
 	}
 }
 
