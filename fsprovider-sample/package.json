@@ -3,7 +3,7 @@
 	"displayName": "MemFS - a file system provider sample",
 	"description": "Showcase for the file system provider API, also useful for testing again document that are not on disk.",
 	"version": "0.0.3",
-	"publisher": "vscode-samples",
+	"publisher": "vscode-3samples",
 	"private": true,
 	"license": "MIT",
 	"repository": {
