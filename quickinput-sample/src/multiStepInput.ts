@@ -3,7 +3,7 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { QuickPickItem, window, Disposable, CancellationToken, QuickInputButton, QuickInput, ExtensionContext, QuickInputButtons, Uri } from 'vscode';
+import { QuickPickItem, window, ThemeIcon, Disposable, CancellationToken, QuickInputButton, QuickInput, ExtensionContext, QuickInputButtons, Uri } from 'vscode';
 
 /**
  * A multi-step input using window.createQuickPick() and window.createInputBox().
@@ -141,6 +141,8 @@ class InputFlowAction {
 
 type InputStep = (input: MultiStepInput) => Thenable<InputStep | void>;
 
+const SelectButton: QuickInputButton = { iconPath: new ThemeIcon("arrow-small-down"), tooltip: "Alter valueSelection" }
+
 interface QuickPickParameters<T extends QuickPickItem> {
 	title: string;
 	step: number;
@@ -254,15 +256,19 @@ class MultiStepInput {
 				input.step = step;
 				input.totalSteps = totalSteps;
 				input.value = value || '';
+				(input as any).valueSelection = value ? [0, 1] : undefined;
 				input.prompt = prompt;
 				input.buttons = [
 					...(this.steps.length > 1 ? [QuickInputButtons.Back] : []),
-					...(buttons || [])
+					...(buttons || []),
+					SelectButton
 				];
 				let validating = validate('');
 				disposables.push(
 					input.onDidTriggerButton(item => {
-						if (item === QuickInputButtons.Back) {
+						if (item === SelectButton) {
+							(input as any).valueSelection = [0, input.value.length - 1];
+						} else if (item === QuickInputButtons.Back) {
 							reject(InputFlowAction.back);
 						} else {
 							resolve(<any>item);
