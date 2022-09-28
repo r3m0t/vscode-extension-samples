@@ -20,6 +20,9 @@ export const getContentFromFilesystem = async (uri: vscode.Uri) => {
 	}
 };
 
+const APPLE = [new vscode.TestTag("apple")];
+const BANANA = [new vscode.TestTag("banana")];
+
 export class TestFile {
 	public didResolve = false;
 
@@ -59,6 +62,7 @@ export class TestFile {
 				const tcase = controller.createTestItem(id, data.getLabel(), item.uri);
 				testData.set(tcase, data);
 				tcase.range = range;
+				tcase.tags = thisGeneration % 2 == 0 ? APPLE : BANANA;
 				parent.children.push(tcase);
 			},
 
@@ -71,6 +75,7 @@ export class TestFile {
 				thead.range = range;
 				testData.set(thead, new TestHeading(thisGeneration));
 				parent.children.push(thead);
+				thead.tags = thisGeneration % 2 == 0 ? APPLE : BANANA;
 				ancestors.push({ item: thead, children: [] });
 			},
 		});

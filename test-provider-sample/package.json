@@ -16,6 +16,24 @@
 	"categories": [
 		"Other"
 	],
+	"contributes": {
+		"commands": [
+			{"category": "Foo",
+		"title": "Apple",
+		"command": "tps.apple"},
+	{"category": "Foo",
+	"title": "Banana",
+	"command": "tps.banana"}
+
+		],
+		"menus": {
+			"testing/item/context": [
+				{"command": "tps.apple"},
+				{"command": "tps.banana", "when": "'banana' in testing.testItemTags"}
+				
+			]
+		}
+	},
 	"activationEvents": [
 		"workspaceContains:*.md"
 	],

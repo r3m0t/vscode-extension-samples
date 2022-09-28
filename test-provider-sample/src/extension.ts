@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
 import { getContentFromFilesystem, MarkdownTestData, TestCase, testData, TestFile } from './testTree';
 
+let ctrl: vscode.TestController;
 export async function activate(context: vscode.ExtensionContext) {
-	const ctrl = vscode.tests.createTestController('mathTestController', 'Markdown Math');
+	ctrl = vscode.tests.createTestController('mathTestController', 'Markdown Math');
 	context.subscriptions.push(ctrl);
 
 	const runHandler = (request: vscode.TestRunRequest, cancellation: vscode.CancellationToken) => {
@@ -124,8 +125,27 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.workspace.onDidOpenTextDocument(updateNodeForDocument),
 		vscode.workspace.onDidChangeTextDocument(e => updateNodeForDocument(e.document)),
+		vscode.commands.registerCommand("tps.apple", (e) => {
+			console.log("apple");
+			console.log(e);
+		}),vscode.commands.registerCommand("tps.banana", (e) => {
+			setTag = !setTag;
+			console.log("banana", setTag);
+			ctrl.items.forEach(flipTag);
+		})
+
 	);
+
+	function flipTag(d: vscode.TestItem) {
+		d.tags = setTag ? [tag] : [];
+		console.log(d.id, d.tags.length);
+		d.children.forEach(flipTag);
+	}
 }
+
+let setTag = false;
+
+const tag = new vscode.TestTag("mytag");
 
 function getOrCreateFile(controller: vscode.TestController, uri: vscode.Uri) {
 	const existing = controller.items.get(uri.toString());
