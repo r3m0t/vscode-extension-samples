@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import * as vscode from 'vscode';
 import { getContentFromFilesystem, MarkdownTestData, TestCase, testData, TestFile } from './testTree';
 
@@ -85,24 +86,39 @@ export async function activate(context: vscode.ExtensionContext) {
 
 		discoverTests(request.include ?? gatherTestItems(ctrl.items)).then(runTestQueue);
 	};
+	const fitItems  = async (_item: vscode.TestItem|undefined) => {
+		const eg = ctrl.createTestItem('eg', 'Error');
+		eg.error = randomUUID();
+		const eg2 = ctrl.createTestItem('eg2', 'Sort');
+		for (let i = 0; i < 3; i++) {
+			const item = ctrl.createTestItem(`eg2-${i}`, `Item ${i}`);
+			const sort = randomUUID().substring(0, 3);
+			item.label += ` ${sort}`;
+			item.sortText = sort;
+			eg2.children.add(item);
+		}
+		ctrl.items.replace([eg, eg2]);
+
+		// if (!item) {
+		// 	context.subscriptions.push(...startWatchingWorkspace(ctrl));
+		// 	return;
+		// }
+
+		// const data = testData.get(item);
+		// if (data instanceof TestFile) {
+		// 	await data.updateFromDisk(ctrl, item);
+		// }
+	};
 
 	ctrl.refreshHandler = async () => {
-		await Promise.all(getWorkspaceTestPatterns().map(({ pattern }) => findInitialFiles(ctrl, pattern)));
+		await fitItems(undefined);
+		//await Promise.all(getWorkspaceTestPatterns().map(({ pattern }) => findInitialFiles(ctrl, pattern)));
 	};
 
 	ctrl.createRunProfile('Run Tests', vscode.TestRunProfileKind.Run, runHandler, true);
 
-	ctrl.resolveHandler = async item => {
-		if (!item) {
-			context.subscriptions.push(...startWatchingWorkspace(ctrl));
-			return;
-		}
+	ctrl.resolveHandler = fitItems;
 
-		const data = testData.get(item);
-		if (data instanceof TestFile) {
-			await data.updateFromDisk(ctrl, item);
-		}
-	};
 
 	function updateNodeForDocument(e: vscode.TextDocument) {
 		if (e.uri.scheme !== 'file') {
