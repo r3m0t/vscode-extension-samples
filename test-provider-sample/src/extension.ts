@@ -89,7 +89,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	const fitItems  = async (_item: vscode.TestItem|undefined) => {
 		const eg = ctrl.createTestItem('eg', 'Error');
 		eg.error = randomUUID();
-		const eg2 = ctrl.createTestItem('eg2', 'Sort');
+		const eg2 = ctrl.createTestItem('eg2', 'Sort sortText');
 		for (let i = 0; i < 3; i++) {
 			const item = ctrl.createTestItem(`eg2-${i}`, `Item ${i}`);
 			const sort = randomUUID().substring(0, 3);
@@ -97,7 +97,14 @@ export async function activate(context: vscode.ExtensionContext) {
 			item.sortText = sort;
 			eg2.children.add(item);
 		}
-		ctrl.items.replace([eg, eg2]);
+		const eg3 = ctrl.createTestItem('eg3', 'Sort label');
+		for (let i = 0; i < 3; i++) {
+			const item = ctrl.createTestItem(`eg3-${i}`, `Item`);
+			const sort = randomUUID().substring(0, 3);
+			item.label += ` ${sort} ${i}`;
+			eg3.children.add(item);
+		}
+		ctrl.items.replace([eg, eg2, eg3]);
 
 		// if (!item) {
 		// 	context.subscriptions.push(...startWatchingWorkspace(ctrl));
