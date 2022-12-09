@@ -2,7 +2,7 @@
 	"name": "calico-colors",
 	"description": "Calico Colors - A Webview View API Sample",
 	"version": "0.0.1",
-	"publisher": "vscode-samples",
+	"publisher": "vscode-samp2les",
 	"private": true,
 	"license": "MIT",
 	"repository": {
@@ -21,18 +21,46 @@
 	],
 	"activationEvents": [
 		"onView:calicoColors.colorsView",
+		"onView:red",
+		"onView:green",
+		"onView:blue",
 		"onCommand:calicoColors.addColor",
 		"onCommand:calicoColors.clearColors"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"viewsContainers": {
+			"activitybar": [
+				{
+					"id": "foo",
+					"title": "Foo",
+					"icon": "media/dep.svg"
+				}
+			]
+		},
 		"views": {
-			"explorer": [
+			"foo": [
 				{
 					"type": "webview",
-					"id": "calicoColors.colorsView",
-					"name": "Calico Colors"
+					"id": "red",
+					"name": "Red"
+				},
+				{
+					"type": "webview",
+					"id": "green",
+					"name": "Green"
+				},
+				{
+					"type": "webview",
+					"id": "blue",
+					"name": "Blue RCWH"
+				},
+				{
+					"type": "tree",
+					"id": "tree",
+					"name": "Tree"
 				}
+				
 			]
 		},
 		"commands": [
@@ -56,6 +84,12 @@
 					"when": "view == calicoColors.colorsView"
 				}
 			]
+		},
+		"configuration":{
+			"title": "Foo",
+			"properties": {
+				"webviewSlow": {"default": 0, "type": "number", "description": "Slow", "title": "Delay"}
+			}
 		}
 	},
 	"scripts": {
