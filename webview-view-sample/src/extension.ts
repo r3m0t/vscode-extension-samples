@@ -1,11 +1,85 @@
 import * as vscode from 'vscode';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 
 	const provider = new ColorsViewProvider(context.extensionUri);
+	const channel = vscode.window.createOutputChannel('Webview Slow');
+	channel.appendLine("Loading...");
+
+	const delay = vscode.workspace.getConfiguration('foo').get<number>('webviewSlow', 0);
+
+	await new Promise((resolve) => setTimeout(resolve, delay));
+	channel.appendLine(`Loaded after ${delay}`);
+
+	for (const color of (['red', 'blue', 'green'] as const)) {
+		const content: string[] = []; 
+		if (color !== 'red') {
+		for (let i = 0; i < 60; i += 1) {
+			content.push(`<div>${i}</div>`);
+		}
+	}
+	context.subscriptions.push(
+		vscode.window.registerWebviewViewProvider(
+			color,
+			{
+				resolveWebviewView(webviewView, context, token) {
+					webviewView.webview.html = `<!DOCTYPE html>
+					<html lang="en">
+					<head>
+						<meta charset="UTF-8">
+						<style>
+						body, html {
+							background-color: ${color};
+							color: white;
+							border: white dashed 3px;
+							box-sizing: border-box;
+							width: 100%;
+							height: 100%;
+							margin: 0;
+							padding: 0;
+						}
+						div{display:inline-block; margin: 0.4em;}
+						</style>
+		
+						<title>Cat Colors</title>
+					</head>
+					<body>
+						
+					${content.join("")}
+					</body>
+					</html>`;
+				},
+			},
+			{webviewOptions: {retainContextWhenHidden: color === "blue"}}
+		));
+	}
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(ColorsViewProvider.viewType, provider));
+		vscode.window.createTreeView(
+			"tree",
+			{
+				treeDataProvider: {
+					getChildren(element) {
+						if (element !== undefined) return [];
+						const ret = [];
+						for (let i = 0; i < 200; i++) {
+							ret.push(
+								new vscode.TreeItem(
+									i.toString()
+
+								)
+							);
+						}
+						return ret;
+					},
+					getTreeItem(element) {
+						return element;
+					},
+
+				} as vscode.TreeDataProvider<vscode.TreeItem>
+			}
+		)
+	)
 
 	context.subscriptions.push(
 		vscode.commands.registerCommand('calicoColors.addColor', () => {
@@ -88,8 +162,9 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
 				<meta charset="UTF-8">
 
 				<!--
-					Use a content security policy to only allow loading images from https or from our extension directory,
+					Use a content security policy to only allow loading styles from our extension directory,
 					and only allow scripts that have a specific nonce.
+					(See the 'webview-sample' extension sample for img-src content security policy examples)
 				-->
 				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource}; script-src 'nonce-${nonce}';">
 
@@ -98,7 +173,7 @@ class ColorsViewProvider implements vscode.WebviewViewProvider {
 				<link href="${styleResetUri}" rel="stylesheet">
 				<link href="${styleVSCodeUri}" rel="stylesheet">
 				<link href="${styleMainUri}" rel="stylesheet">
-				
+
 				<title>Cat Colors</title>
 			</head>
 			<body>
